@@ -1,3 +1,11 @@
+#Create a new stack with a specified name (one command)
+#aws cloudformation create-stack --stack-name sample-name 
+#--template-body file://C:/Users/Sonja/Desktop/AW-materiaalit/Harjoituksia/Viikko5-CloudFormation-Projekti1/Cloud-formation/IaC.yaml
+
+#Deploy changes to a spesified stack (one command)
+#aws cloudformation deploy --template-file IaC.yaml 
+#--stack-name arn:aws:cloudformation:eu-central-1:341014156608:stack/sonja-iac-stack/016ddad0-5e98-11ed-8f3f-0a916fe9d25a
+
 AWSTemplateFormatVersion: 2010-09-09
 Description: Academy Demo CloudFormation
 
@@ -60,7 +68,7 @@ Parameters:
     Default: subnet-0e22fe88dfee7f1bb
   MyIP:
     Type: String
-    Default: 172.31.0.0/16
+    Default: 172.31.0.0/16 #Any IP
 
 Resources:
   SonjaALBSecurityGroup:
@@ -86,9 +94,6 @@ Resources:
         - !Ref FrankfurtDefaultSubnetB
         - !Ref FrankfurtDefaultSubnetC
 
-
-
-  
-
-  
-
+Outputs:
+  ALBDnsName:
+    Value: !GetAtt SonjaLoadBalancer.DNSName
