@@ -6,9 +6,17 @@ Parameters:
     Description: Sonja-Bucket-IaC
     Type: String
     Default: sonja-iac-bucket
+  QueName:
+    Description: Sonja-SQS
+    Type: String
+    Default: sonja-sqs-iac
 
 Resources:
   MyBucketResources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref MyBucketName
+  MyQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueName
