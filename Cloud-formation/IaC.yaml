@@ -1,20 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Academy Demo CloudFormation
 
+#Bucket
 Parameters:
   MyBucketName:
     Description: Sonja-Bucket-IaC
     Type: String
     Default: sonja-iac-bucket
-  
-  QueName:
-    Description: Sonja-SQS
-    Type: String
-    Default: sonja-sqs-iac
-
-  LatestAmiId:
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
 Resources:
   MyBucketResources:
@@ -22,13 +14,81 @@ Resources:
     Properties:
       BucketName: !Ref MyBucketName
   
+#SQS
+Parameters:
+  QueName:
+    Description: Sonja-SQS
+    Type: String
+    Default: sonja-sqs-iac
+
+Resources:
   MyQueue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Ref QueName
-  
+
+#EC2
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
   Ec2Instance:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref LatestAmiId
       InstanceType: t2.micro
+
+
+#LoadBalancer & Security group
+Parameters:
+  FrankfurtDefaultVPC: 
+    Type: String
+    Default: vpc-04d8286a16830aa93
+  LoadBalancerHTTPPort: 
+    Type: Number
+    Default: 80
+  FrankfurtDefaultSubnetA: 
+    Type: String
+    Default: subnet-05d3b0a17a69db66c
+  FrankfurtDefaultSubnetB: 
+    Type: String
+    Default: subnet-007362971dda4ec3e
+  FrankfurtDefaultSubnetC: 
+    Type: String
+    Default: subnet-0e22fe88dfee7f1bb
+  MyIP:
+    Type: String
+    Default: 172.31.0.0/16
+
+Resources:
+  SonjaALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'security group for load balancer'
+      VpcId: !Ref FrankfurtDefaultVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref LoadBalancerHTTPPort
+          ToPort: !Ref LoadBalancerHTTPPort
+          CidrIp: !Sub ${MyIP}/32
+
+  SonjaLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref SonjaALBSecurityGroup
+      Subnets:
+        - !Ref FrankfurtDefaultSubnetA
+        - !Ref FrankfurtDefaultSubnetB
+        - !Ref FrankfurtDefaultSubnetC
+
+
+
+  
+
+  
+
