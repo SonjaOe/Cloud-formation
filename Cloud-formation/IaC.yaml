@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Academy Demo CloudFormation
+
+Parameters:
+  MyBucketName:
+    Description: Sonja-Bucket-IaC
+    Type: String
+    Default: sonja-iac-bucket
+
+Resources:
+  MyBucketResources:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref MyBucketName
